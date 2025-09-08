@@ -22,6 +22,9 @@ drizzle-kit/
 .DS_Store
 Thumbs.db
 
+# Credentials
+certs/
+
 # Personal notes
 *.md
 !README.md
