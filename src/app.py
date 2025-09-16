@@ -1,26 +1,23 @@
-from auth import verifyFBAuth
 from fastapi import Depends, FastAPI, Header, HTTPException
-from typing import Optional
+from routes import dataRoute
+from contextlib import asynccontextmanager
+import httpx
 
 app = FastAPI()
-auth_verifier = verifyFBAuth.VerifyFBAuth()
+client: httpx.AsyncClient | None = None
 
-def verify_auth(authorization: Optional[str] = Header(None)):
-    if authorization is None or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=400, detail="Missing or invalid Authorization header")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Instantiate httpx client
+    global client
+    client = httpx.AsyncClient()
+    yield
     
-    current_user = auth_verifier.verify_token(authorization.split(" ")[1])
+    # Clean up HTTPX client
+    await client.aclose()
 
-    if current_user is None:
-        raise HTTPException(status_code=401, detail="Invalid token")
+app.include_router(dataRoute.dataRouter)
 
-    return current_user
-
-@app.get("/users/")
-async def read_users(current_user: dict = Depends(verify_auth)):
-    return [{"username": "Rick"}, {"username": "Morty"}]
-
-
-@app.post("/users/")
-async def create_user(current_user: dict = Depends(verify_auth)):
-    return [{"username": "Rick"}, {"username": "NewMorty"}]
+# Dependency getter
+def get_client() -> httpx.AsyncClient:
+    return client
