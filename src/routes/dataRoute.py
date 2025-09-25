@@ -1,15 +1,19 @@
 from fastapi import APIRouter, Depends
-import httpx
-from utils.requestContext import RequestContext, get_req_context
+from src.utils.requestContext import RequestContext, get_req_context
+from src.controllers import dataController as controller
+from src.models.dbModels import *
 
 dataRouter = APIRouter()
 
 @dataRouter.get("/users/")
 async def read_users(context: RequestContext = Depends(get_req_context)):
-    async with httpx.AsyncClient() as client:
-        return [{"username": "Rick"}, {"username": "Morty"}]
+    return await controller.get_user(context)
 
 
 @dataRouter.post("/users/")
-async def create_user(context: RequestContext = Depends(get_req_context)):
-    return [{"username": "Rick"}, {"username": "NewMorty"}]
+async def create_user(
+    user: UserCreate,
+    context: RequestContext = Depends(get_req_context),
+):
+    print(f"Creating user {user}")
+    return await controller.create_user(user, context)

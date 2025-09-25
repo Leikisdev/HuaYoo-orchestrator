@@ -2,8 +2,8 @@ from typing import Any
 from httpx import AsyncClient
 from fastapi import Header
 from typing import Optional
-from app import get_client
-from verifyFBAuth import verify_auth
+from src.utils.config import settings
+from src.utils.verifyFBAuth import verify_auth
 
 class RequestContext:
     client: AsyncClient
@@ -15,6 +15,6 @@ class RequestContext:
 
 def get_req_context(authorization: Optional[str] = Header(None)) -> RequestContext: 
     return RequestContext(
-        get_client(),
+        settings.client,
         verify_auth(authorization)
     )
