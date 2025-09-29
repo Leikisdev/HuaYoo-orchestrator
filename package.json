@@ -1,0 +1,6 @@
+{
+    "scripts": {
+        "dev": "fastapi run ./src/app.py",
+        "dev:web" : "set PLATFORM=web&&fastapi run ./src/app.py"
+    }
+}

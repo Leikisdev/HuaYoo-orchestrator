@@ -1,23 +1,22 @@
-import os
-from dotenv import load_dotenv
+from pydantic_settings import BaseSettings
+from pydantic import Field
 from httpx import AsyncClient
+from functools import cache
 
-ENV = os.getenv("ENV", "development")
-if ENV == "development":
-    load_dotenv()
+class Settings(BaseSettings):
+    # Overwritten from .env file if applicable
+    ENV: str = "development"
+    ORM_BASE: str = "http://localhost:3000"
+    AI_URL: str = "http://localhost:5000"
+    
+    # runtime-only client, created automatically and ignored by basesetting .env file handling
+    client: AsyncClient = Field(default_factory=lambda: AsyncClient(), exclude=True)
 
-class Settings:
-    def __init__(self, client: AsyncClient):
-        self.env = ENV
-        self.client = client
+    class Config:
+        env_file = ".env"
+        extra = "allow"
 
-        if self.env == "development":
-            # Localhost URLs
-            self.orm_base = "http://localhost:3000"
-            self.ai_url = "http://localhost:5000"
-        else:
-            # Production URLs
-            self.orm_base = f"http://{os.getenv("ORM_BASE")}"
-            self.ai_url = f"https://{os.getenv("AI_URL")}"
-
-settings: Settings | None = None
+# Caches settings so they are only set up once
+@cache
+def get_settings() -> Settings:
+    return Settings()

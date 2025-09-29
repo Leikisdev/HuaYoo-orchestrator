@@ -1,18 +1,36 @@
 from fastapi import FastAPI
 from src.routes import dataRoute
 from contextlib import asynccontextmanager
-from httpx import AsyncClient
-from src.utils.config import settings, Settings
+import src.utils.config as config
+from dotenv import load_dotenv
+import os
 
-app = FastAPI()
+load_dotenv()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Instantiate settings - including HTTPX client
-    settings = Settings(AsyncClient())
+    print("Setting up app")
     yield
     
     # Clean up HTTPX client
-    await settings.client.aclose()
+    await config.get_settings().client.aclose()
 
+app = FastAPI(lifespan=lifespan)
 app.include_router(dataRoute.dataRouter)
+
+# If frontend is running as web app, CORS handling is needed
+if os.environ['PLATFORM'] == 'web':
+    print("Setting up CORS")
+    from fastapi.middleware.cors import CORSMiddleware
+    origins = [
+        "http://localhost:8081",  # Expo web
+        "http://127.0.0.1:8081",
+    ]
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
