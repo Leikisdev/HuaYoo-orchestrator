@@ -223,8 +223,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - [HuaYoo-app](../HuaYoo-app/) - React Native mobile application
 - [HuaYooORM](../HuaYooORM/) - PostgreSQL database service
-- [nginx](../nginx/) - Reverse proxy configuration
-
-## 📞 Support
-
-For questions or issues, please open an issue in the repository or contact the development team.
