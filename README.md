@@ -5,4 +5,4 @@
 To run locally, 
 1. Install requirements by running `pip install -r requirements.txt`
 2. Fetch 
-3. From root directory, run command `fastapi run `
+3. From root directory, run command `npm run dev`
