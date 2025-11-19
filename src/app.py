@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from src.routes import dataRoute
+from src.routes.data import userRoute
 from contextlib import asynccontextmanager
 import src.utils.config as config
 from dotenv import load_dotenv
@@ -16,7 +16,7 @@ async def lifespan(app: FastAPI):
     await config.get_settings().client.aclose()
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(dataRoute.dataRouter)
+app.include_router(userRoute.userRouter)
 
 # If frontend is running as web app, CORS handling is needed
 if os.environ['PLATFORM'] == 'web':

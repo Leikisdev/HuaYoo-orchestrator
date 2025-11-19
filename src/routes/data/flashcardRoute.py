@@ -1,16 +1,16 @@
 from fastapi import APIRouter, Depends
 from src.utils.requestContext import RequestContext, get_req_context
-from src.controllers import dataController as controller
+from src.controllers.data import userController as controller
 from src.models.dbModels import *
 
-dataRouter = APIRouter()
+wordRouter = APIRouter(prefix="/users")
 
-@dataRouter.get("/users/")
+@userRouter.get("/")
 async def read_users(context: RequestContext = Depends(get_req_context)):
     return await controller.get_user(context)
 
 
-@dataRouter.post("/users/")
+@userRouter.post("/")
 async def create_user(
     user: UserCreate,
     context: RequestContext = Depends(get_req_context),

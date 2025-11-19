@@ -17,59 +17,12 @@ class UserRead(BaseModel):
     createdAt: datetime
     lastModifiedAt: datetime
 
-
-# ---------- Words ----------
-class WordCreate(BaseModel):
-    userId: int
-    hanziSimplified: Optional[str] = None
-    hanziTraditional: Optional[str] = None
-    pinyinTone: Optional[str] = None
-    frequencyRank: Optional[int] = None
-
-
-class WordRead(BaseModel):
-    id: int
-    userId: int
-    hanziSimplified: Optional[str] = None
-    hanziTraditional: Optional[str] = None
-    pinyinTone: Optional[str] = None
-    frequencyRank: Optional[int] = None
-    createdAt: datetime
-    updatedAt: datetime
-
-
-# ---------- Translations ----------
-class TranslationCreate(BaseModel):
-    wordId: int
-    shortGloss: str
-    definitionLong: Optional[str] = None
-    usageNotes: Optional[str] = None
-    register: Optional[str] = None
-    partOfSpeech: Optional[str] = None
-    source: Optional[str] = None
-    isAiSuggested: Optional[bool] = False
-
-
-class TranslationRead(BaseModel):
-    id: int
-    wordId: int
-    shortGloss: str
-    definitionLong: Optional[str] = None
-    usageNotes: Optional[str] = None
-    register: Optional[str] = None
-    partOfSpeech: Optional[str] = None
-    source: Optional[str] = None
-    isAiSuggested: bool
-    createdAt: datetime
-    updatedAt: datetime
-
-
 # ---------- Sentences ----------
 class SentenceCreate(BaseModel):
-    translationId: int
+    cardId: Optional[int] = None
     chinese: str
     pinyin: Optional[str] = None
-    english: Optional[str] = None
+    english: str
     source: Optional[str] = None
     isAiGenerated: Optional[bool] = False
     audioUrl: Optional[str] = None
@@ -77,7 +30,7 @@ class SentenceCreate(BaseModel):
 
 class SentenceRead(BaseModel):
     id: int
-    translationId: int
+    cardId: int
     chinese: str
     pinyin: Optional[str] = None
     english: Optional[str] = None
@@ -102,12 +55,12 @@ class TagRead(BaseModel):
 
 # ---------- TranslationTags (join) ----------
 class TranslationTagCreate(BaseModel):
-    translationId: int
+    cardId: int
     tagId: int
 
 
 class TranslationTagRead(BaseModel):
-    translationId: int
+    cardId: int
     tagId: int
 
 
@@ -116,8 +69,6 @@ class DeckCreate(BaseModel):
     userId: int
     name: str
     isAiComposed: Optional[bool] = False
-    lastPracticeAt: Optional[datetime] = None
-
 
 class DeckRead(BaseModel):
     id: int
@@ -129,15 +80,14 @@ class DeckRead(BaseModel):
 
 
 # ---------- DeckTranslations (join) ----------
-class DeckTranslationCreate(BaseModel):
+class DeckCardCreate(BaseModel):
     deckId: int
-    translationId: int
+    cardId: int
     position: int
 
-
-class DeckTranslationRead(BaseModel):
+class DeckCardRead(BaseModel):
     deckId: int
-    translationId: int
+    cardId: int
     position: int
     addedAt: datetime
 
@@ -145,7 +95,7 @@ class DeckTranslationRead(BaseModel):
 # ---------- Reviews ----------
 class ReviewCreate(BaseModel):
     userId: int
-    translationId: int
+    cardId: int
     deckId: Optional[int] = None
     rating: int = Field(ge=0, le=32767)
     intervalDays: Optional[int] = 0
@@ -158,7 +108,7 @@ class ReviewCreate(BaseModel):
 class ReviewRead(BaseModel):
     id: int
     userId: int
-    translationId: int
+    cardId: int
     deckId: Optional[int] = None
     reviewedAt: datetime
     rating: int
@@ -168,21 +118,22 @@ class ReviewRead(BaseModel):
     lapses: int
     dueAt: Optional[datetime] = None
 
-
-# ---------- Recommendations ----------
-class RecommendationCreate(BaseModel):
+# ---------- Flashcards ----------
+class FlashcardRegister(BaseModel):
     userId: int
-    sourceTranslationId: Optional[int] = None
-    suggestedTranslationId: int
-    reason: Optional[str] = None
-    score: Optional[float] = 0.0
+    hanziSimplified: str
+    hanziTraditional: Optional[str] = None
+    isAiGenerated: bool = False
+    pinyin: str  
+    sentences: Optional[list[SentenceCreate]] = None
 
-
-class RecommendationRead(BaseModel):
-    id: int
+class FlashcardRead(BaseModel):
+    cardId: int
     userId: int
-    sourceTranslationId: Optional[int] = None
-    suggestedTranslationId: int
-    reason: Optional[str] = None
-    score: float
+    hanziSimplified: str
+    hanziTraditional: Optional[str] = None
+    pinyin: str
+    translation: str
+    sentences: list[SentenceRead]
     createdAt: datetime
+    updatedAt: datetime
